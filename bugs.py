@@ -1,5 +1,6 @@
 import shapes
 from math import cos, sin, pi
+from random import random, randrange
 
 class Bug:
   """
@@ -29,15 +30,7 @@ class Bug:
       mom - bugs.Bug
       dad - bugs.Bug
     """
-    if mom is not None and dad is not None:
-      self.brain = brain
-      self.x = (mom.x + dad.x)/2
-      self.y = (mom.y + dad.y)/2
-
-      self.brain = Brain(mom.brain, dad.brain)
-      name = 'TODO'
-      antennae = Antennae(mom.antennae, dad.antennae)
-    else:
+    if mom is None or dad is None:
       # Default constructor
       print 'Constructing default bug.'
       self.brain = Brain()
@@ -46,8 +39,18 @@ class Bug:
       self.brain = Brain()
       self.name = name
       self.antennae = Antennae()
-    
-    self.color = [0,1,0]
+      self.color = [random(),random(),random()]
+    else:
+      # Inherited constructor
+      self.brain = brain
+      self.x = (mom.x + dad.x)/2
+      self.y = (mom.y + dad.y)/2
+
+      self.brain = Brain(mom.brain, dad.brain)
+      name = 'TODO'
+      antennae = Antennae(mom.antennae, dad.antennae)
+      self.color = [0,1,0]
+      
     self.mass = 60
     self.age = 0
 
@@ -75,13 +78,16 @@ class Antennae:
       l1 - Length of antenna 1 
       l2 - Length of antenna 2
   """
+  _MAX_LENGTH = 160
+  _MIN_LENGTH = 20
+
   def __init__(self, antenae1=None, antenae2=None):
     if antenae1 is None or antenae2 is None:
-      self.theta1 = pi/8
-      self.theta2 = -pi/8
+      self.theta1 = 2*pi*random()
+      self.theta2 = 2*pi*random()
         
-      self.l1 = 80
-      self.l2 = 80
+      self.l1 = randrange(Antennae._MIN_LENGTH, Antennae._MAX_LENGTH)
+      self.l2 = randrange(Antennae._MIN_LENGTH, Antennae._MAX_LENGTH)
     else:
       print 'Warning: antennae inheritance not implemented'
 
