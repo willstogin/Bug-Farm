@@ -31,14 +31,12 @@ class Square:
     gl.glPopMatrix()
 
 class Circle:
-  def __init__(self, width, height, xpos, ypos):
+  def __init__(self, xpos, ypos, scale=1):
     self.xpos = xpos
     self.ypos = ypos
     self.angle = 0
-    self.size = max(width, height)
+    self.size = scale
     self.rgb = [1,1,1]
-    x = width/2.0
-    y = height/2.0
     self.vlist = CIRCLE_VERTS
 
   def draw(self):
@@ -49,3 +47,16 @@ class Circle:
     gl.glColor3f(*self.rgb)
     self.vlist.draw(gl.GL_TRIANGLE_FAN)
     gl.glPopMatrix()
+
+def draw_circle(xpos, ypos, size, rgb):
+  gl.glPushMatrix()
+  gl.glTranslatef(xpos, ypos, 0)
+  gl.glScalef(size, size, size)
+  gl.glColor3f(*rgb)
+  CIRCLE_VERTS.draw(gl.GL_TRIANGLE_FAN)
+  gl.glPopMatrix()
+
+def draw_line(x1, y1, x2, y2, rgb):
+    vlist = pyglet.graphics.vertex_list(2, ('v2f', [x1,y1,x2,y2]))
+    gl.glColor3f(*rgb)
+    vlist.draw(gl.GL_LINES)
