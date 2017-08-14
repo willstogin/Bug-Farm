@@ -3,47 +3,65 @@ from pyglet import gl
 
 from shapes import Square, Circle
 from bugs import Bug
+from environment import World
 
-DEATH_WEIGHT = 30
-MIN_BUGS = 1
 
-window = pyglet.window.Window()
-keyboard = pyglet.window.key.KeyStateHandler()
-window.push_handlers(keyboard)
+class Farm(pyglet.window.Window):
+  MIN_BUGS = 1
 
-living_bugs = list()
+  def __init__(self):
+    super(Farm, self).__init__()
 
-@window.event
-def on_draw():
-  gl.glClearColor(0, 0.3, 0.5, 0)
-  gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+    # Set up window
+    self.keyboard = pyglet.window.key.KeyStateHandler()
+    self.push_handlers(self.keyboard)
 
-  # Grow (TODO)
+    # Set up environment
+    self.living_bugs = []
+    #self.world = World()
 
-  # Update and kill
-  for bug in living_bugs:
-    bug.update()
-    if bug.mass < DEATH_WEIGHT:
-      living_bugs.remove(bug)
+    # Populate world
+    bug = Bug()
+    self.living_bugs.append(bug)
 
-  # Repopulate
-  while len(living_bugs) < MIN_BUGS:
-    living_bugs.append(Bug())
+  def run(self):
+    # Start simulation
+    pyglet.clock.schedule_interval(self.update,1/10.0)
+    pyglet.app.run()
+    
+  def update(self, dummy):
+    if self.keyboard[pyglet.window.key.H]:
+      print 'Help requested... sorry.'
 
-  # Draw
-  for bug in living_bugs:
-    bug.draw()
+  def on_draw(self):
+    gl.glClearColor(0, 0.3, 0.5, 0)
+    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+  
+    # Grow (TODO)
+  
+  
+    # Update and kill
+    for bug in self.living_bugs:
+      bug.update()
+      if not bug.isAlive:
+        self.living_bugs.remove(bug)
+  
+    # Repopulate
+    while len(self.living_bugs) < self.MIN_BUGS:
+      self.living_bugs.append(Bug())
+  
+    # Draw
+    for bug in self.living_bugs:
+      bug.draw()
 
-def update(dummy):
-  if keyboard[pyglet.window.key.H]:
-    square1.xpos -= 5
+
+
+
 
 def main():
   """ Main function for running world """
-  bug = Bug()
-  living_bugs.append(bug)
-  pyglet.clock.schedule_interval(update,1/10.0)
-  pyglet.app.run()
+  Farm().run()
+  
 
 
 if __name__ == "__main__":

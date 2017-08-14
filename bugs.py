@@ -15,6 +15,7 @@ class Bug:
       mass - Amount of substance to the bug
       age - Number of ticks since birth
       color - (r,g,b) value of bug (may determine diet in the future)
+      isDead - True if alive
 
 
     Methods:
@@ -22,6 +23,7 @@ class Bug:
         parent bugs.
       draw() - Draws the bug as it is at the moment
   """
+  DEATH_WEIGHT = 30
 
   def __init__(self, mom=None, dad=None, name='TODO'):
     """
@@ -53,10 +55,12 @@ class Bug:
       
     self.mass = 60
     self.age = 0
+    self.isAlive = True
 
   def update(self):
     self.age += 1
     self.mass -= 1
+    self.isAlive = (self.mass > self.DEATH_WEIGHT)
 
   def draw(self):
     """
@@ -113,6 +117,20 @@ class Antennae:
 class Brain:
   """
     Dictates the bug's senses and actions
+
+    Senses that can be detected at any antenna 
+    point or under the center of the bug:
+      RGB at location
+      Is another bug there?
+
+    Internal senses that are not location dependent:
+      Mass
+      
+
   """
   def __init__(self, brain1=None, brain2=None):
-    print 'Warning: brain not yet implemented.'
+    if brain1 is None or brain2 is None:
+      pass
+    else:
+      print 'Warning: brain inheritance not yet implemented'
+
