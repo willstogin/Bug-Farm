@@ -2,8 +2,8 @@ from random import random
 from shapes import draw_square
 
 class World:
-  _BOXES_WIDE = 30
-  _BOXES_TALL = 20
+  _BOXES_WIDE = 15
+  _BOXES_TALL = 10
 
   def __init__(self, width, height):
     """
@@ -13,24 +13,25 @@ class World:
       height - Number of pixels tall the world is
     """
     self.box_width = width/self._BOXES_WIDE
+    print 'box width: ', self.box_width
     self.box_height = height/self._BOXES_TALL
 
     self.tiles = []
-    for i in World._BOXES_TALL:
-      self.tiles[i] = []
-      for j in World._BOXES_WIDE:
-        self.tiles[i][j] = Tile()
+    for i in range(World._BOXES_TALL):
+      self.tiles.append([])
+      for j in range(World._BOXES_WIDE):
+        self.tiles[i].append(Tile())
 
   def update(self):
     pass
 
   def draw(self):
     y = 0
-    for i in World._BOXES_TALL:
-      y += self.box_height/2
+    for i in range(World._BOXES_TALL):
+      y += self.box_height
       x = 0
-      for j in World._BOXES_WIDE:
-        x += self.box_width/2
+      for j in range(World._BOXES_WIDE):
+        x += self.box_width
         tile = self.tiles[i][j]
         draw_square(x, y, self.box_width, self.box_height, tile.seed)
 

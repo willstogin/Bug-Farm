@@ -18,7 +18,10 @@ class Farm(pyglet.window.Window):
 
     # Set up environment
     self.living_bugs = []
-    #self.world = World()
+    
+    self.world = World(self.width, self.height)
+    print 'width: ', self.width
+    print 'height: ', self.height
 
     # Populate world
     bug = Bug()
@@ -26,19 +29,22 @@ class Farm(pyglet.window.Window):
 
   def run(self):
     # Start simulation
-    pyglet.clock.schedule_interval(self.update,1/10.0)
+    pyglet.clock.schedule_interval(self.update,1/20.0)
     pyglet.app.run()
     
   def update(self, dummy):
     if self.keyboard[pyglet.window.key.H]:
       print 'Help requested... sorry.'
 
+  def on_mouse_motion(type, x, y, dx, dy):
+    print 'x: ', x, ' y: ', y
+
   def on_draw(self):
-    gl.glClearColor(0, 0.3, 0.5, 0)
+    #gl.glClearColor(0, 0.3, 0.5, 0)
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
   
     # Grow (TODO)
-  
+    self.world.draw()
   
     # Update and kill
     for bug in self.living_bugs:
