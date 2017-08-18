@@ -29,6 +29,7 @@ class Bug:
   DEATH_WEIGHT = 15
   MAX_TURN_SPEED = pi/4
   MAX_MOVEMENT_SPEED = 50
+  MAX_MASS = 100
   MAX_EATING = 10
   SCALE = .5
 
@@ -46,9 +47,9 @@ class Bug:
       self.x = environment.width/2
       self.y = environment.height/2
       self.brain = Brain()
-      self.turn_speed = random() * self.MAX_TURN_SPEED
-      self.direction = random() * 2*pi
-      self.move_speed = random() * self.MAX_MOVEMENT_SPEED
+      self.turn_speed = myrand() * self.MAX_TURN_SPEED
+      self.direction = myrand() * 2*pi
+      self.move_speed = myrand() * self.MAX_MOVEMENT_SPEED
       self.name = name
       self.antennae = Antennae()
       self.color = [random(),random(),random()]
@@ -91,11 +92,11 @@ class Bug:
                                  tile_a2.hsv[0],
                                  tile_a2.hsv[1],
                                  tile_a2.hsv[2],)
-      if True: #action[0] > .5:
-        # Eat
-        self.mass += tile.eat(action[0]*self.MAX_EATING)
+     
+      # Eat
+      self.mass += tile.eat(action[0]*self.MAX_EATING)
 
-      if action[1] > .66:
+      if True: #action[1] > .66:
         # Move forward
         speed = self.move_speed*action[1]
       elif action[1] > .33:
@@ -113,13 +114,13 @@ class Bug:
       self.mass -= .1*speed * .05*self.mass
       if action[2]:
         # Turn
-        self.direction += action[2] * self.turn_speed
+        self.direction += (action[2]-.5) * self.turn_speed
 
     else:
       # Do dying things now
       pass
 
-    self.mass = 30
+    self.mass = min(self.mass, self.MAX_MASS)
 
   def draw(self):
     """
@@ -209,29 +210,7 @@ class Brain:
   """
   def __init__(self, brain1=None, brain2=None):
     if brain1 is None or brain2 is None:
-      self.layer1 = []
-      
-      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
-
-      self.layer2 = []
-      self.layer2.append([random(), random(), random(), random(), random(), random(), random()])
-      self.layer2.append([random(), random(), random(), random(), random(), random(), random()])
-      self.layer2.append([random(), random(), random(), random(), random(), random(), random()])
-      self.layer2.append([random(), random(), random(), random(), random(), random(), random()])
-      self.layer2.append([random(), random(), random(), random(), random(), random(), random()])
-
-      self.layer3 = []
-      self.layer3.append([random(), random(), random(), random(), random()])
-      self.layer3.append([random(), random(), random(), random(), random()])
-      self.layer3.append([random(), random(), random(), random(), random()])
-
-
+      self.layertest = [myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()]
 
     else:
       print 'Warning: brain inheritance not yet implemented'
@@ -239,23 +218,12 @@ class Brain:
   def decide(self, h, s, v, mass, ah1, as1, av1, ah2, as2, av2):
     inputs = [h,s,v,mass, ah1, as1, av1, ah2, as2, av2]
 
-    outs1 = [self.__tanh(dot(inputs, self.layer1[0])),
-             self.__tanh(dot(inputs, self.layer1[1])),
-             self.__tanh(dot(inputs, self.layer1[2])),
-             self.__tanh(dot(inputs, self.layer1[3])),
-             self.__tanh(dot(inputs, self.layer1[4])),
-             self.__tanh(dot(inputs, self.layer1[5])),
-             self.__tanh(dot(inputs, self.layer1[6]))]
+    ins = inputs[0:3]
 
-    outs2 = [self.__tanh(dot(outs1, self.layer2[0])),
-             self.__tanh(dot(outs1, self.layer2[1])),
-             self.__tanh(dot(outs1, self.layer2[2])),
-             self.__tanh(dot(outs1, self.layer2[3])),
-             self.__tanh(dot(outs1, self.layer2[4]))]
-
-    return (self.__tanh(dot(outs2,self.layer3[0])),
-            self.__tanh(dot(outs2,self.layer3[1])),
-            self.__tanh(dot(outs2,self.layer3[2])))
+    val = [self.__tanh(dot(ins,self.layertest[0])),
+            self.__tanh(dot(ins,self.layertest[1])),
+            self.__tanh(dot(ins,self.layertest[2]))]
+    return self.__tanh(dot(inputs,self.layertest[0]))
 
   # The Sigmoid function, which describes an S shaped curve.
   # We pass the weighted sum of the inputs through this function to
@@ -271,3 +239,6 @@ class Brain:
 
   def __tanh(self,x):
     return (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+
+def myrand():
+  return random() * 2 - 1
