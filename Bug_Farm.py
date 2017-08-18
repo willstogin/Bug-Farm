@@ -24,7 +24,7 @@ class Farm(pyglet.window.Window):
     print 'height: ', self.height
 
     # Populate world
-    bug = Bug()
+    bug = Bug(self.world)
     self.living_bugs.append(bug)
 
   def run(self):
@@ -35,10 +35,7 @@ class Farm(pyglet.window.Window):
   def update(self, dummy):
     if self.keyboard[pyglet.window.key.H]:
       print 'Help requested... sorry.'
-
-  def on_mouse_motion(type, x, y, dx, dy):
-    print 'x: ', x, ' y: ', y
-
+      
   def on_draw(self):
     #gl.glClearColor(0, 0.3, 0.5, 0)
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
@@ -54,7 +51,7 @@ class Farm(pyglet.window.Window):
   
     # Repopulate
     while len(self.living_bugs) < self.MIN_BUGS:
-      self.living_bugs.append(Bug())
+      self.living_bugs.append(Bug(self.world))
   
     # Draw
     for bug in self.living_bugs:

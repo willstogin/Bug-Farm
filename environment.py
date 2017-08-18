@@ -35,6 +35,9 @@ class World:
         tile = self.tiles[i][j]
         draw_square(x, y, self.box_width, self.box_height, tile.seed)
 
+  def get_square(self, x, y):
+    pass
+
 
 
 

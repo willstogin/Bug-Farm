@@ -25,11 +25,12 @@ class Bug:
         parent bugs.
       draw() - Draws the bug as it is at the moment
   """
-  DEATH_WEIGHT = 3
-  TURN_SPEED = pi/20
-  MOVEMENT_SPEED = 10
+  DEATH_WEIGHT = 15
+  MAX_TURN_SPEED = pi/4
+  MAX_MOVEMENT_SPEED = 50
+  SCALE = .5
 
-  def __init__(self, mom=None, dad=None, name='TODO'):
+  def __init__(self, environment, mom=None, dad=None, name='TODO'):
     """
       Creates a bug from two parents.
 
@@ -43,6 +44,8 @@ class Bug:
       self.x = 300
       self.y = 200
       self.brain = Brain()
+      self.turn_speed = random() * self.MAX_TURN_SPEED
+      self.move_speed = random() * self.MAX_MOVEMENT_SPEED
       self.name = name
       self.antennae = Antennae()
       self.color = [random(),random(),random()]
@@ -61,6 +64,7 @@ class Bug:
     self.age = 0
     self.direction = 0
     self.isAlive = True
+    self.environment = environment
 
   def update(self):
     self.age += 1
@@ -76,11 +80,11 @@ class Bug:
         pass
       if action[1]:
         # Move forward
-        self.x += cos(self.direction)*self.MOVEMENT_SPEED
-        self.y += sin(self.direction)*self.MOVEMENT_SPEED
+        self.x += cos(self.direction)*self.move_speed
+        self.y += sin(self.direction)*self.move_speed
       if action[2]:
         # Turn
-        self.direction += self.TURN_SPEED
+        self.direction += self.turn_speed
 
     else:
       # Do dying things now
@@ -93,6 +97,7 @@ class Bug:
     gl.glPushMatrix()
     gl.glTranslatef(self.x, self.y, 0)
     gl.glRotatef(self.direction*180/pi, 0, 0, 1)
+    gl.glScalef(self.SCALE, self.SCALE, 1)
     shapes.draw_circle(0, 0, self.mass, self.color)
     self.antennae.draw(0,0)
     gl.glPopMatrix()
