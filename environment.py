@@ -18,13 +18,12 @@ class World:
     self.box_height = height/self._BOXES_TALL
 
     self.tiles = []
+    self.changes = set()
     for i in range(World._BOXES_TALL):
       self.tiles.append([])
       for j in range(World._BOXES_WIDE):
-        self.tiles[i].append(Tile())
-
-  def update(self):
-    pass
+        tile = Tile(self.changes)
+        self.tiles[i].append(tile)
 
   def draw(self):
     y = 0
@@ -37,9 +36,8 @@ class World:
         draw_square(x, y, self.box_width, self.box_height, tile.hsv)
 
   def update(self):
-    for list in self.tiles:
-      for tile in list:
-        tile.grow()
+    for tile in self.changes:
+      tile.grow()
 
   def get_tile(self, x, y):
     """
@@ -52,6 +50,9 @@ class World:
 
     return self.tiles[col][row]
   
+_TYPE = 0 
+_AMOUNT = 1
+_RATE = 2
 class Tile:
   """
     Class representing a food-bearing tile
@@ -61,19 +62,22 @@ class Tile:
     SAT indicates the amount of food available
   """
 
-  def __init__(self):
+  def __init__(self, change_list):
     self.hsv = []
     self.hsv.append(random())  #hue
     self.hsv.append(random())  #value
     self.hsv.append(random())  #saturation
+    self.change_list = change_list
+    change_list.add(self)
 
   def grow(self):
     """ 
       Increases the SAT as indicated by the VAL
     """
-    change = self.hsv[1]/3
-    print 'Change: ', change
-    self.hsv[2] = min(1, self.hsv[2] + change)
+    change = self.hsv[_RATE]/3
+    self.hsv[_AMOUNT] = min(1, self.hsv[_AMOUNT] + change)
+    if self.hsv[2] == 1:
+      self.change_list.remove(self)
 
   def eat(self, amount):
     """
@@ -81,9 +85,10 @@ class Tile:
 
       returns - how much food is actually eaten. I.e. amount or how much was left.
     """
-    food = self.hsv[2] * 10
+    food = self.hsv[_AMOUNT] * 10
     eaten = min(amount, food)
     change = eaten/10
-    self.hsv[2] -= change
-    print 'Eaten: ', eaten
+    self.hsv[_AMOUNT] -= change
+    if self not in self.change_list:
+      self.change_list.add(self)
     return eaten
