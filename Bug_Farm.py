@@ -10,7 +10,7 @@ class Farm(pyglet.window.Window):
   MIN_BUGS = 1
 
   def __init__(self):
-    super(Farm, self).__init__()
+    super(Farm, self).__init__(1500,1000)
 
     # Set up window
     self.keyboard = pyglet.window.key.KeyStateHandler()

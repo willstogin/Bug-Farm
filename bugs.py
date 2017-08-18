@@ -43,8 +43,8 @@ class Bug:
       # Default constructor
       print 'Constructing default bug.'
       self.brain = Brain()
-      self.x = 300
-      self.y = 200
+      self.x = environment.width/2
+      self.y = environment.height/2
       self.brain = Brain()
       self.turn_speed = random() * self.MAX_TURN_SPEED
       self.direction = random() * 2*pi
@@ -91,8 +91,8 @@ class Bug:
       if True: #action[1] > 1:
         # Move forward
         speed = self.move_speed*action[1]
-        self.x += cos(self.direction)*speed
-        self.y += sin(self.direction)*speed
+        self.x = min(max(self.x + cos(self.direction)*speed, 0), self.environment.width)
+        self.y = min(max(self.y + sin(self.direction)*speed,0), self.environment.height)
 
 
         self.mass -= .1*speed * .05*self.mass

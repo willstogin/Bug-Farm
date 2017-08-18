@@ -3,8 +3,8 @@ from math import pi
 from shapes import draw_square
 
 class World:
-  _BOXES_WIDE = 15
-  _BOXES_TALL = 10
+  _BOXES_WIDE = 30
+  _BOXES_TALL = 15
 
   def __init__(self, width, height):
     """
@@ -13,6 +13,8 @@ class World:
       width - Number of pixels wide the world is
       height - Number of pixels tall the world is
     """
+    self.width =width
+    self.height = height
     self.box_width = width/self._BOXES_WIDE
     print 'box width: ', self.box_width
     self.box_height = height/self._BOXES_TALL
