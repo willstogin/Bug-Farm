@@ -77,6 +77,13 @@ class Bug:
       if action[0]:
         # Eat
         print 'Warning: Does not know how to eat.'
+        try:
+          tile = self.environment.get_tile(self.x, self.y)
+          tile.seed = [0,0,0]
+        except IndexError:
+          print 'Error: bug offscreen trying to eat.'
+
+
         pass
       if action[1]:
         # Move forward

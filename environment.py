@@ -35,12 +35,17 @@ class World:
         tile = self.tiles[i][j]
         draw_square(x, y, self.box_width, self.box_height, tile.seed)
 
-  def get_square(self, x, y):
-    pass
+  def get_tile(self, x, y):
+    """
+      Gets the tile at location x,y
 
+      Returns Tile instance
+    """
+    row = int(x/self.box_width)
+    col = int(y/self.box_height)
 
-
-
+    return self.tiles[col][row]
+  
 class Tile:
   def __init__(self):
     self.seed = [random(),random(),random()]
