@@ -5,6 +5,7 @@ from math import cos, sin, pi
 from numpy import exp, array, random, dot
 from random import random, randrange
 
+
 class Bug:
   """
     The first creature for our farm.
@@ -47,9 +48,9 @@ class Bug:
       self.x = environment.width/2
       self.y = environment.height/2
       self.brain = Brain()
-      self.turn_speed = myrand() * self.MAX_TURN_SPEED
-      self.direction = myrand() * 2*pi
-      self.move_speed = myrand() * self.MAX_MOVEMENT_SPEED
+      self.turn_speed = random() * self.MAX_TURN_SPEED
+      self.direction = random() * 2*pi
+      self.move_speed = random() * self.MAX_MOVEMENT_SPEED
       self.name = name
       self.antennae = Antennae()
       self.color = [random(),random(),random()]
@@ -207,8 +208,15 @@ class Brain:
       Eat
       Move forward
       Turn
+      Mate
   """
+  
+  counter = 0
+  inc = .01
   def __init__(self, brain1=None, brain2=None):
+    counter = Brain.counter
+    print counter
+    inc = Brain.inc
     if brain1 is None or brain2 is None:
       self.layertest = [myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()]
 
@@ -241,4 +249,5 @@ class Brain:
     return (exp(x) - exp(-x)) / (exp(x) + exp(-x))
 
 def myrand():
-  return random() * 2 - 1
+  return random() * 50 - 25
+
