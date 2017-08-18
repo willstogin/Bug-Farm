@@ -37,8 +37,9 @@ class World:
         draw_square(x, y, self.box_width, self.box_height, tile.hsv)
 
   def update(self):
-    for tile in self.tiles:
-      tile.grow()
+    for list in self.tiles:
+      for tile in list:
+        tile.grow()
 
   def get_tile(self, x, y):
     """
@@ -68,9 +69,11 @@ class Tile:
 
   def grow(self):
     """ 
-      Increases the SAT as indicated by teh VAL
+      Increases the SAT as indicated by the VAL
     """
-    self.hsv[1] = min(1, hsv[1] + hsv[2]/3)
+    change = self.hsv[1]/3
+    print 'Change: ', change
+    self.hsv[2] = min(1, self.hsv[2] + change)
 
   def eat(self, amount):
     """
@@ -78,8 +81,9 @@ class Tile:
 
       returns - how much food is actually eaten. I.e. amount or how much was left.
     """
-    food = self.hsv[2] * 100
+    food = self.hsv[2] * 10
     eaten = min(amount, food)
-    change = eaten/100
-    self.hsv[2] -= eaten
+    change = eaten/10
+    self.hsv[2] -= change
+    print 'Eaten: ', eaten
     return eaten

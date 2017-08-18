@@ -45,6 +45,7 @@ class Bug:
       self.y = 200
       self.brain = Brain()
       self.turn_speed = random() * self.MAX_TURN_SPEED
+      self.direction = random() * 2*pi
       self.move_speed = random() * self.MAX_MOVEMENT_SPEED
       self.name = name
       self.antennae = Antennae()
@@ -62,7 +63,6 @@ class Bug:
       
     self.mass = 60
     self.age = 0
-    self.direction = 0
     self.isAlive = True
     self.environment = environment
 
@@ -76,19 +76,18 @@ class Bug:
       action = self.brain.decide()
       if action[0]:
         # Eat
-        print 'Warning: Does not know how to eat.'
         try:
           tile = self.environment.get_tile(self.x, self.y)
-          tile.seed = [0,0,0]
+          self.mass += tile.eat(9)
         except IndexError:
           print 'Error: bug offscreen trying to eat.'
 
-
-        pass
       if action[1]:
         # Move forward
         self.x += cos(self.direction)*self.move_speed
         self.y += sin(self.direction)*self.move_speed
+
+        self.mass -= self.move_speed
       if action[2]:
         # Turn
         self.direction += self.turn_speed

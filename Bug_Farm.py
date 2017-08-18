@@ -41,6 +41,7 @@ class Farm(pyglet.window.Window):
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
   
     # Grow (TODO)
+    self.world.update()
     self.world.draw()
   
     # Update and kill
