@@ -1,6 +1,7 @@
 import pyglet
 from pyglet import gl
 from math import sqrt, cos, sin, pi
+from colorsys import hsv_to_rgb
 
 # Use circle verts with tirangle fan to get unit circle
 _CIRCLE_POINTS = [0,0]
@@ -27,6 +28,7 @@ class Square:
     gl.glRotatef(self.angle, 0, 0, 1)
     gl.glScalef(self.size, self.size, self.size)
     gl.glColor3f(*self.rgb)
+    gl.glcolor4
     self.vlist.draw(gl.GL_TRIANGLE_STRIP)
     gl.glPopMatrix()
 
@@ -49,23 +51,23 @@ class Circle:
     gl.glPopMatrix()
 
 
-def draw_square(xpos, ypos, height, width, rgb):
+def draw_square(xpos, ypos, height, width, hsv):
   gl.glPushMatrix()
   gl.glTranslatef(xpos, ypos, 0)
   gl.glScalef(height, width, 1)
-  gl.glColor3f(*rgb)
+  gl.glColor3f(*hsv_to_rgb(*hsv))
   SQUARE_VERTS.draw(gl.GL_TRIANGLE_STRIP)
   gl.glPopMatrix()
 
-def draw_circle(xpos, ypos, size, rgb):
+def draw_circle(xpos, ypos, size, hsv):
   gl.glPushMatrix()
   gl.glTranslatef(xpos, ypos, 0)
   gl.glScalef(size, size, size)
-  gl.glColor3f(*rgb)
+  gl.glColor3f(*hsv_to_rgb(*hsv))
   CIRCLE_VERTS.draw(gl.GL_TRIANGLE_FAN)
   gl.glPopMatrix()
 
-def draw_line(x1, y1, x2, y2, rgb):
+def draw_line(x1, y1, x2, y2, hsv):
     vlist = pyglet.graphics.vertex_list(2, ('v2f', [x1,y1,x2,y2]))
-    gl.glColor3f(*rgb)
+    gl.glColor3f(*hsv_to_rgb(*hsv))
     vlist.draw(gl.GL_LINES)

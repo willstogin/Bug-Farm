@@ -1,4 +1,5 @@
 from random import random
+from math import pi
 from shapes import draw_square
 
 class World:
@@ -33,7 +34,7 @@ class World:
       for j in range(World._BOXES_WIDE):
         x += self.box_width
         tile = self.tiles[i][j]
-        draw_square(x, y, self.box_width, self.box_height, tile.seed)
+        draw_square(x, y, self.box_width, self.box_height, tile.hsv)
 
   def get_tile(self, x, y):
     """
@@ -48,5 +49,7 @@ class World:
   
 class Tile:
   def __init__(self):
-    self.seed = [random(),random(),random()]
-    self.color = [0,0,0]
+    self.hsv = []
+    self.hsv.append(random())  #hue
+    self.hsv.append(random())  #value
+    self.hsv.append(random())  #saturation

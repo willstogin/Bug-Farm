@@ -160,7 +160,7 @@ class Brain:
 
     Senses that can be detected at any antenna 
     point or under the center of the bug:
-      RGB at location
+      HSV at location
       Is another bug there?
 
     Internal senses that are not location dependent:
