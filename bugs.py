@@ -1,4 +1,5 @@
 import shapes
+from environment import Tile
 from pyglet import gl
 from math import cos, sin, pi
 from numpy import exp, array, random, dot
@@ -28,6 +29,7 @@ class Bug:
   DEATH_WEIGHT = 15
   MAX_TURN_SPEED = pi/4
   MAX_MOVEMENT_SPEED = 50
+  MAX_EATING = 10
   SCALE = .5
 
   def __init__(self, environment, mom=None, dad=None, name='TODO'):
@@ -70,28 +72,33 @@ class Bug:
     self.age += 1
     self.mass -= 1
     self.isAlive = (self.mass > self.DEATH_WEIGHT)
+    try:
+      tile = self.environment.get_tile(self.x, self.y)
+    except IndexError:
+      tile = Tile(h=0, s=0, v=0)
+
 
     if self.isAlive:
       # Do living things now
-      action = self.brain.decide()
-      if action[0]:
+      action = self.brain.decide(tile.hsv[0],
+                                 tile.hsv[1],
+                                 tile.hsv[2],
+                                 self.mass)
+      if True: #action[0] > .5:
         # Eat
-        try:
-          tile = self.environment.get_tile(self.x, self.y)
-          self.mass += tile.eat(9)
-        except IndexError:
-          print 'Error: bug offscreen trying to eat.'
+        self.mass += tile.eat(action[0]*self.MAX_EATING)
 
-      if action[1]:
+      if True: #action[1] > 1:
         # Move forward
-        self.x += cos(self.direction)*self.move_speed
-        self.y += sin(self.direction)*self.move_speed
+        speed = self.move_speed*action[1]
+        self.x += cos(self.direction)*speed
+        self.y += sin(self.direction)*speed
 
 
-        self.mass -= self.move_speed + .05*self.mass
+        self.mass -= .1*speed * .05*self.mass
       if action[2]:
         # Turn
-        self.direction += self.turn_speed
+        self.direction += action[2] * self.turn_speed
 
     else:
       # Do dying things now
@@ -157,6 +164,7 @@ class Antennae:
 class Brain:
   """
     Dictates the bug's senses and actions
+    Neural net method taken from https://medium.com/technology-invention-and-more/how-to-build-a-simple-neural-network-in-9-lines-of-python-code-cc8f23647ca1
 
     Senses that can be detected at any antenna 
     point or under the center of the bug:
@@ -173,9 +181,44 @@ class Brain:
   """
   def __init__(self, brain1=None, brain2=None):
     if brain1 is None or brain2 is None:
-      pass
+      self.layer1 = []
+      
+      self.layer1.append([random(), random(), random(), random()])
+      self.layer1.append([random(), random(), random(), random()])
+      self.layer1.append([random(), random(), random(), random()])
+      self.layer1.append([random(), random(), random(), random()])
+
+      self.layer2 = []
+      self.layer2.append([random(), random(), random(), random()])
+      self.layer2.append([random(), random(), random(), random()])
+      self.layer2.append([random(), random(), random(), random()])
     else:
       print 'Warning: brain inheritance not yet implemented'
 
-  def decide(self):
-    return (1,1,1)
+  def decide(self, h, s, v, mass):
+    inputs = [h,s,v,mass]
+
+    outs1 = [self.__tanh(dot(inputs, self.layer1[0])),
+             self.__tanh(dot(inputs, self.layer1[0])),
+             self.__tanh(dot(inputs, self.layer1[0])),
+             self.__tanh(dot(inputs, self.layer1[0]))]
+
+
+    return (self.__tanh(dot(outs1,self.layer2[0])),
+            self.__tanh(dot(outs1,self.layer2[1])),
+            self.__tanh(dot(outs1,self.layer2[2])))
+
+  # The Sigmoid function, which describes an S shaped curve.
+  # We pass the weighted sum of the inputs through this function to
+  # normalise them between 0 and 1.
+  def __sigmoid(self, x):
+    return 1 / (1 + exp(-x))
+  
+  # The derivative of the Sigmoid function.
+  # This is the gradient of the Sigmoid curve.
+  # It indicates how confident we are about the existing weight.
+  def __sigmoid_derivative(self, x):
+    return x * (1 - x)
+
+  def __tanh(self,x):
+    return (exp(x) - exp(-x)) / (exp(x) + exp(-x))

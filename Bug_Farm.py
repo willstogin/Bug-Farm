@@ -35,6 +35,8 @@ class Farm(pyglet.window.Window):
   def update(self, dummy):
     if self.keyboard[pyglet.window.key.H]:
       print 'Help requested... sorry.'
+    if self.keyboard[pyglet.window.key.SPACE]:
+      self.living_bugs.append(Bug(self.world))
       
   def on_draw(self):
     #gl.glClearColor(0, 0.3, 0.5, 0)

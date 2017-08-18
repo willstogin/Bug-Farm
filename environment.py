@@ -62,13 +62,26 @@ class Tile:
     SAT indicates the amount of food available
   """
 
-  def __init__(self, change_list):
+  def __init__(self, change_list=None, h=None, s=None, v=None):
     self.hsv = []
-    self.hsv.append(random())  #hue
-    self.hsv.append(random())  #value
-    self.hsv.append(random())  #saturation
+    if h is None:
+      self.hsv.append(random())  #hue
+    else:
+      self.hsv.append(h)
+      
+    if s is None:
+      self.hsv.append(random())  #value
+    else:
+      self.hsv.append(s)
+
+    if v is None:
+      self.hsv.append(random())  #saturation
+    else:
+      self.hsv.append(v)
+      
     self.change_list = change_list
-    change_list.add(self)
+    if change_list is not None:
+      change_list.add(self)
 
   def grow(self):
     """ 
@@ -85,10 +98,13 @@ class Tile:
 
       returns - how much food is actually eaten. I.e. amount or how much was left.
     """
-    food = self.hsv[_AMOUNT] * 10
+    food = self.hsv[_AMOUNT] * 7
     eaten = min(amount, food)
-    change = eaten/10
+    change = eaten/7
     self.hsv[_AMOUNT] -= change
-    if self not in self.change_list:
+
+
+    if (self.change_list is not None 
+        and self not in self.change_list):
       self.change_list.add(self)
     return eaten
