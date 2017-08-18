@@ -1,5 +1,7 @@
 import shapes
+from pyglet import gl
 from math import cos, sin, pi
+from numpy import exp, array, random, dot
 from random import random, randrange
 
 class Bug:
@@ -23,7 +25,9 @@ class Bug:
         parent bugs.
       draw() - Draws the bug as it is at the moment
   """
-  DEATH_WEIGHT = 30
+  DEATH_WEIGHT = 3
+  TURN_SPEED = pi/20
+  MOVEMENT_SPEED = 10
 
   def __init__(self, mom=None, dad=None, name='TODO'):
     """
@@ -55,6 +59,7 @@ class Bug:
       
     self.mass = 60
     self.age = 0
+    self.direction = 0
     self.isAlive = True
 
   def update(self):
@@ -62,12 +67,35 @@ class Bug:
     self.mass -= 1
     self.isAlive = (self.mass > self.DEATH_WEIGHT)
 
+    if self.isAlive:
+      # Do living things now
+      action = self.brain.decide()
+      if action[0]:
+        # Eat
+        print 'Warning: Does not know how to eat.'
+        pass
+      if action[1]:
+        # Move forward
+        self.x += cos(self.direction)*self.MOVEMENT_SPEED
+        self.y += sin(self.direction)*self.MOVEMENT_SPEED
+      if action[2]:
+        # Turn
+        self.direction += self.TURN_SPEED
+
+    else:
+      # Do dying things now
+      pass
+
   def draw(self):
     """
       Draws the Bug.
     """
-    shapes.draw_circle(self.x, self.y, self.mass, self.color)
-    self.antennae.draw(self.x, self.y)
+    gl.glPushMatrix()
+    gl.glTranslatef(self.x, self.y, 0)
+    gl.glRotatef(self.direction*180/pi, 0, 0, 1)
+    shapes.draw_circle(0, 0, self.mass, self.color)
+    self.antennae.draw(0,0)
+    gl.glPopMatrix()
 
 
 
@@ -126,7 +154,10 @@ class Brain:
     Internal senses that are not location dependent:
       Mass
       
-
+    Actions:
+      Eat
+      Move forward
+      Turn
   """
   def __init__(self, brain1=None, brain2=None):
     if brain1 is None or brain2 is None:
@@ -134,3 +165,5 @@ class Brain:
     else:
       print 'Warning: brain inheritance not yet implemented'
 
+  def decide(self):
+    return (1,1,1)
