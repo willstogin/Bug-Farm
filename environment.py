@@ -36,6 +36,10 @@ class World:
         tile = self.tiles[i][j]
         draw_square(x, y, self.box_width, self.box_height, tile.hsv)
 
+  def update(self):
+    for tile in self.tiles:
+      tile.grow()
+
   def get_tile(self, x, y):
     """
       Gets the tile at location x,y
@@ -48,8 +52,34 @@ class World:
     return self.tiles[col][row]
   
 class Tile:
+  """
+    Class representing a food-bearing tile
+
+    HUE indicates the type of food being grown
+    VAL indicates the growth rate of the food
+    SAT indicates the amount of food available
+  """
+
   def __init__(self):
     self.hsv = []
     self.hsv.append(random())  #hue
     self.hsv.append(random())  #value
     self.hsv.append(random())  #saturation
+
+  def grow(self):
+    """ 
+      Increases the SAT as indicated by teh VAL
+    """
+    self.hsv[1] = min(1, hsv[1] + hsv[2]/3)
+
+  def eat(self, amount):
+    """
+      Removes up to amount of food from the tile.
+
+      returns - how much food is actually eaten. I.e. amount or how much was left.
+    """
+    food = self.hsv[2] * 100
+    eaten = min(amount, food)
+    change = eaten/100
+    self.hsv[2] -= eaten
+    return eaten
