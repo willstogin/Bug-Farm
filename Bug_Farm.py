@@ -1,5 +1,6 @@
 import pyglet
 from pyglet import gl
+import random
 
 from shapes import Square, Circle
 from bugs import Bug
@@ -18,13 +19,15 @@ class Farm(pyglet.window.Window):
 
     # Set up environment
     self.living_bugs = []
+
+    self.mating_bugs = set()
     
     self.world = World(self.width, self.height)
     print 'width: ', self.width
     print 'height: ', self.height
 
     # Populate world
-    bug = Bug(self.world)
+    bug = Bug(self.world, self.mating_bugs)
     self.living_bugs.append(bug)
 
   def run(self):
@@ -36,7 +39,7 @@ class Farm(pyglet.window.Window):
     if self.keyboard[pyglet.window.key.H]:
       print 'Help requested... sorry.'
     if self.keyboard[pyglet.window.key.SPACE]:
-      self.living_bugs.append(Bug(self.world))
+      self.living_bugs.append(Bug(self.world, self.mating_bugs))
       
   def on_draw(self):
     #gl.glClearColor(0, 0.3, 0.5, 0)
@@ -47,14 +50,24 @@ class Farm(pyglet.window.Window):
     self.world.draw()
   
     # Update and kill
+    random.shuffle(self.living_bugs)
     for bug in self.living_bugs:
       bug.update()
       if not bug.isAlive:
         self.living_bugs.remove(bug)
   
     # Repopulate
+    while len(self.mating_bugs) > 1:
+      print 'MATING!'
+      bug1 = self.mating_bugs.pop()
+      bug2 = self.mating_bugs.pop()
+
+      bug1.mate()
+      bug2.mate()
+      self.living_bugs.append(Bug(self.world, self.mating_bugs, bug1, bug2))
+
     while len(self.living_bugs) < self.MIN_BUGS:
-      self.living_bugs.append(Bug(self.world))
+      self.living_bugs.append(Bug(self.world, self.mating_bugs))
   
     # Draw
     for bug in self.living_bugs:

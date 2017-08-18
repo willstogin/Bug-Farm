@@ -1,7 +1,7 @@
 import shapes
 from environment import Tile
 from pyglet import gl
-from math import cos, sin, pi
+from math import cos, sin, pi, fabs
 from numpy import exp, array, random, dot
 from random import random, randrange
 
@@ -34,7 +34,7 @@ class Bug:
   MAX_EATING = 10
   SCALE = .5
 
-  def __init__(self, environment, mom=None, dad=None, name='TODO'):
+  def __init__(self, environment, mating, mom=None, dad=None, name='TODO'):
     """
       Creates a bug from two parents.
 
@@ -69,10 +69,11 @@ class Bug:
     self.age = 0
     self.isAlive = True
     self.environment = environment
+    self.mates = mating
 
   def update(self):
     self.age += 1
-    self.mass -= 1
+    self.mass -= 5
     self.isAlive = (self.mass > self.DEATH_WEIGHT)
     try:
       tile = self.environment.get_tile(self.x, self.y)
@@ -93,9 +94,9 @@ class Bug:
                                  tile_a2.hsv[0],
                                  tile_a2.hsv[1],
                                  tile_a2.hsv[2],)
-     
+
       # Eat
-      self.mass += tile.eat(action[0]*self.MAX_EATING)
+      self.mass += tile.eat(fabs(action[0])*self.MAX_EATING)
 
       if True: #action[1] > .66:
         # Move forward
@@ -112,10 +113,16 @@ class Bug:
       self.x = min(max(self.x,0), self.environment.width)
       self.y = min(max(self.y,0), self.environment.height)
 
-      self.mass -= .1*speed * .05*self.mass
+      self.mass -= .05*speed * .05*self.mass
       if action[2]:
         # Turn
         self.direction += (action[2]-.5) * self.turn_speed
+
+      if action[3] > .5 and self.mass > 50:
+        self.mates.add(self)
+        print self.mates
+      else:
+        self.mates.discard(self)
 
     else:
       # Do dying things now
@@ -135,6 +142,8 @@ class Bug:
     self.antennae.draw(0,0)
     gl.glPopMatrix()
 
+  def mate(self):
+    self.mass -= 30
 
 
 
@@ -218,7 +227,10 @@ class Brain:
     print counter
     inc = Brain.inc
     if brain1 is None or brain2 is None:
-      self.layertest = [myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()]
+      self.layertest = []
+      self.layertest.append([myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
 
     else:
       print 'Warning: brain inheritance not yet implemented'
@@ -226,12 +238,10 @@ class Brain:
   def decide(self, h, s, v, mass, ah1, as1, av1, ah2, as2, av2):
     inputs = [h,s,v,mass, ah1, as1, av1, ah2, as2, av2]
 
-    ins = inputs[0:3]
-
-    val = [self.__tanh(dot(ins,self.layertest[0])),
-            self.__tanh(dot(ins,self.layertest[1])),
-            self.__tanh(dot(ins,self.layertest[2]))]
-    return self.__tanh(dot(inputs,self.layertest[0]))
+    return (self.__tanh(dot(inputs,self.layertest[0])),
+            self.__tanh(dot(inputs,self.layertest[0])),
+            self.__tanh(dot(inputs,self.layertest[0])),
+            self.__tanh(dot(inputs,self.layertest[0])))
 
   # The Sigmoid function, which describes an S shaped curve.
   # We pass the weighted sum of the inputs through this function to
@@ -249,5 +259,5 @@ class Brain:
     return (exp(x) - exp(-x)) / (exp(x) + exp(-x))
 
 def myrand():
-  return random() * 50 - 25
+  return 2*random() - 1
 
