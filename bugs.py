@@ -87,7 +87,8 @@ class Bug:
         self.x += cos(self.direction)*self.move_speed
         self.y += sin(self.direction)*self.move_speed
 
-        self.mass -= self.move_speed
+
+        self.mass -= self.move_speed + .05*self.mass
       if action[2]:
         # Turn
         self.direction += self.turn_speed

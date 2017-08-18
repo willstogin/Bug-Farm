@@ -74,7 +74,7 @@ class Tile:
     """ 
       Increases the SAT as indicated by the VAL
     """
-    change = self.hsv[_RATE]/3
+    change = self.hsv[_RATE]/5
     self.hsv[_AMOUNT] = min(1, self.hsv[_AMOUNT] + change)
     if self.hsv[2] == 1:
       self.change_list.remove(self)
