@@ -50,7 +50,11 @@ class World:
     row = int(x/self.box_width)
     col = int(y/self.box_height)
 
-    return self.tiles[col][row]
+    try:
+      return self.tiles[col][row]
+    except IndexError:
+      return Tile(h=0,s=0,v=0)
+    
   
 _TYPE = 0 
 _AMOUNT = 1
