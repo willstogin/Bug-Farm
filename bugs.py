@@ -74,6 +74,7 @@ class Bug:
     self.isAlive = (self.mass > self.DEATH_WEIGHT)
     try:
       tile = self.environment.get_tile(self.x, self.y)
+      (tile_a1, tile_a2) = self.antennae.sense(self.x, self.y, self.environment)
     except IndexError:
       tile = Tile(h=0, s=0, v=0)
 
@@ -83,7 +84,13 @@ class Bug:
       action = self.brain.decide(tile.hsv[0],
                                  tile.hsv[1],
                                  tile.hsv[2],
-                                 self.mass)
+                                 self.mass,
+                                 tile_a1.hsv[0],
+                                 tile_a1.hsv[1],
+                                 tile_a1.hsv[2],
+                                 tile_a2.hsv[0],
+                                 tile_a2.hsv[1],
+                                 tile_a2.hsv[2],)
       if True: #action[0] > .5:
         # Eat
         self.mass += tile.eat(action[0]*self.MAX_EATING)
@@ -91,9 +98,11 @@ class Bug:
       if True: #action[1] > 1:
         # Move forward
         speed = self.move_speed*action[1]
-        self.x = min(max(self.x + cos(self.direction)*speed, 0), self.environment.width)
-        self.y = min(max(self.y + sin(self.direction)*speed,0), self.environment.height)
-
+        self.x += min(cos(self.direction)*speed,0)
+        self.y += min(sin(self.direction)*speed,0)
+        # Keep in bounds
+        self.x = min(max(self.x,0), self.environment.width)
+        self.y = min(max(self.y,0), self.environment.height)
 
         self.mass -= .1*speed * .05*self.mass
       if action[2]:
@@ -159,6 +168,17 @@ class Antennae:
                        [0,0,0])
     shapes.draw_line(origx, origy, x, y, [0,0,0])
 
+  def sense(self, origx, origy, env):
+    x = origx + self.l1*cos(self.theta1)
+    y = origy + self.l1*sin(self.theta1)
+    t1 = env.get_tile(x,y)
+    
+    x = origx + self.l2*cos(self.theta2)
+    y = origy + self.l2*sin(self.theta2)
+    t2 = env.get_tile(x,y)
+    return (t1, t2)
+
+
 
 
 class Brain:
@@ -183,10 +203,10 @@ class Brain:
     if brain1 is None or brain2 is None:
       self.layer1 = []
       
-      self.layer1.append([random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random()])
-      self.layer1.append([random(), random(), random(), random()])
+      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
+      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
+      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
+      self.layer1.append([random(), random(), random(), random(), random(), random(), random(), random(), random(), random()])
 
       self.layer2 = []
       self.layer2.append([random(), random(), random(), random()])
@@ -195,8 +215,8 @@ class Brain:
     else:
       print 'Warning: brain inheritance not yet implemented'
 
-  def decide(self, h, s, v, mass):
-    inputs = [h,s,v,mass]
+  def decide(self, h, s, v, mass, ah1, as1, av1, ah2, as2, av2):
+    inputs = [h,s,v,mass, ah1, as1, av1, ah2, as2, av2]
 
     outs1 = [self.__tanh(dot(inputs, self.layer1[0])),
              self.__tanh(dot(inputs, self.layer1[0])),
