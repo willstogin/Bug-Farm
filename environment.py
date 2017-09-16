@@ -21,10 +21,14 @@ class World:
 
     self.tiles = []
     self.changes = set()
+    y = 0
     for i in range(World._BOXES_TALL):
+      y += self.box_height
+      x = 0
       self.tiles.append([])
       for j in range(World._BOXES_WIDE):
-        tile = Tile(self.changes)
+        x += self.box_width
+        tile = Tile(self.changes, x, y, self.box_width, self.box_height)
         self.tiles[i].append(tile)
 
   def draw(self):
@@ -33,9 +37,8 @@ class World:
       y += self.box_height
       x = 0
       for j in range(World._BOXES_WIDE):
-        x += self.box_width
         tile = self.tiles[i][j]
-        draw_square(x, y, self.box_width, self.box_height, tile.hsv)
+        tile.draw()
 
   def update(self):
     for tile in self.changes:
@@ -53,7 +56,7 @@ class World:
     try:
       return self.tiles[col][row]
     except IndexError:
-      return Tile(h=0,s=0,v=0)
+      return Tile(None, 0,0,0,0, h=0,s=0,v=0)
     
   
 _TYPE = 0 
@@ -68,7 +71,7 @@ class Tile:
     SAT indicates the amount of food available
   """
 
-  def __init__(self, change_list=None, h=None, s=None, v=None):
+  def __init__(self, change_list, x, y, width, height, h=None, s=None, v=None):
     self.hsv = []
     if h is None:
       self.hsv.append(random())  #hue
@@ -88,6 +91,14 @@ class Tile:
     self.change_list = change_list
     if change_list is not None:
       change_list.add(self)
+
+    self.x = x
+    self.y = y
+    self.width = width
+    self.height = height
+
+  def draw(self):
+    draw_square(self.x, self.y, self.width, self.height, self.hsv)
 
   def grow(self):
     """ 

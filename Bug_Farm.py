@@ -8,7 +8,7 @@ from environment import World
 
 
 class Farm(pyglet.window.Window):
-  MIN_BUGS = 1
+  MIN_BUGS = 2
 
   def __init__(self):
     super(Farm, self).__init__(1500,1000)
@@ -73,15 +73,9 @@ class Farm(pyglet.window.Window):
     for bug in self.living_bugs:
       bug.draw()
 
-
-
-
-
 def main():
   """ Main function for running world """
   Farm().run()
-  
-
 
 if __name__ == "__main__":
   print 'Running...'

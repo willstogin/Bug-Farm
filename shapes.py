@@ -28,7 +28,6 @@ class Square:
     gl.glRotatef(self.angle, 0, 0, 1)
     gl.glScalef(self.size, self.size, self.size)
     gl.glColor3f(*self.rgb)
-    gl.glcolor4
     self.vlist.draw(gl.GL_TRIANGLE_STRIP)
     gl.glPopMatrix()
 

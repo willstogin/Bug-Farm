@@ -4,6 +4,7 @@ from pyglet import gl
 from math import cos, sin, pi, fabs
 from numpy import exp, array, random, dot
 from random import random, randrange
+import math
 
 
 class Bug:
@@ -47,7 +48,6 @@ class Bug:
       self.brain = Brain()
       self.x = environment.width/2
       self.y = environment.height/2
-      self.brain = Brain()
       self.turn_speed = random() * self.MAX_TURN_SPEED
       self.direction = random() * 2*pi
       self.move_speed = random() * self.MAX_MOVEMENT_SPEED
@@ -56,14 +56,21 @@ class Bug:
       self.color = [random(),random(),random()]
     else:
       # Inherited constructor
-      self.brain = brain
+      self.brain = Brain(mom.brain, dad.brain)
       self.x = (mom.x + dad.x)/2
       self.y = (mom.y + dad.y)/2
 
-      self.brain = Brain(mom.brain, dad.brain)
-      name = 'TODO'
-      antennae = Antennae(mom.antennae, dad.antennae)
-      self.color = [0,1,0]
+      # TODO make these inherited
+      self.turn_speed = (mom.turn_speed + dad.turn_speed)/2
+      self.direction = (mom.direction + dad.direction)/2
+      self.move_speed = (mom.move_speed + dad.move_speed)/2
+
+
+      self.name = 'TODO'
+      self.antennae = Antennae(mom.antennae, dad.antennae)
+      self.color = [(mom.color[0] + dad.color[0])/2,
+                    (mom.color[1] + dad.color[1])/2,
+                    (mom.color[2] + dad.color[2])/2]
       
     self.mass = 60
     self.age = 0
@@ -73,7 +80,7 @@ class Bug:
 
   def update(self):
     self.age += 1
-    self.mass -= 5
+    self.mass -= 1
     self.isAlive = (self.mass > self.DEATH_WEIGHT)
     try:
       tile = self.environment.get_tile(self.x, self.y)
@@ -94,19 +101,21 @@ class Bug:
                                  tile_a2.hsv[0],
                                  tile_a2.hsv[1],
                                  tile_a2.hsv[2],)
+      eat_weight = action[0] #min(max(action[0], 1), -1)
+      move_weight = action[1] #min(max(action[1], 1), -1)
+      turn_weight = action[2] #min(max(action[2], 1), -1)
+      mate_weight = action[3] #min(max(action[3], 1), -1)
+      if action == 0 or True:
+        # Eat 
+        print 'eating'
+        self.mass += tile.eat(fabs(eat_weight)*self.MAX_EATING)
 
-      # Eat
-      self.mass += tile.eat(fabs(action[0])*self.MAX_EATING)
-
-      if True: #action[1] > .66:
+      speed = 0
+      if action == 1 or True:
         # Move forward
-        speed = self.move_speed*action[1]
-      elif action[1] > .33:
-        # stationary
-        speed = 0
-      else:
-        # backawards
-        speed = -self.move_speed*action[1]
+        print 'move'
+        speed = self.move_speed*move_weight
+
       self.x += cos(self.direction)*speed
       self.y += sin(self.direction)*speed
       # Keep in bounds
@@ -114,13 +123,16 @@ class Bug:
       self.y = min(max(self.y,0), self.environment.height)
 
       self.mass -= .05*speed * .05*self.mass
-      if action[2]:
-        # Turn
-        self.direction += (action[2]-.5) * self.turn_speed
 
-      if action[3] > .5 and self.mass > 50:
-        self.mates.add(self)
-        print self.mates
+      if action == 2 or True:
+        # Turn
+        print 'turn'
+        self.direction += self.turn_speed * turn_weight
+
+      if mate_weight > 0 and self.mass > 50:
+        #self.mates.add(self)
+        print 'mate'
+        print self.mates.add(self)
       else:
         self.mates.discard(self)
 
@@ -168,6 +180,13 @@ class Antennae:
       self.l1 = randrange(Antennae._MIN_LENGTH, Antennae._MAX_LENGTH)
       self.l2 = randrange(Antennae._MIN_LENGTH, Antennae._MAX_LENGTH)
     else:
+      # TODO: make a little random
+      self.theta1 = (antenae1.theta1 + antenae2.theta1)/2
+      self.theta2 = (antenae1.theta2 + antenae2.theta2)/2
+
+      self.l1 = (antenae1.l1 + antenae2.l1)/2
+      self.l2 = (antenae1.l2 + antenae2.l2)/2
+
       print 'Warning: antennae inheritance not implemented'
 
   def draw(self, origx, origy):
@@ -224,24 +243,72 @@ class Brain:
   inc = .01
   def __init__(self, brain1=None, brain2=None):
     counter = Brain.counter
-    print counter
     inc = Brain.inc
     if brain1 is None or brain2 is None:
       self.layertest = []
-      self.layertest.append([myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
-      self.layertest.append([myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
-      self.layertest.append([myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+
+      self.layer2 = []
+      self.layer2.append([myrand(),myrand(),myrand(),myrand(),myrand(),myrand(),myrand()])
+      self.layer2.append([myrand(),myrand(),myrand(),myrand(),myrand(),myrand(),myrand()])
+      self.layer2.append([myrand(),myrand(),myrand(),myrand(),myrand(),myrand(),myrand()])
+      self.layer2.append([myrand(),myrand(),myrand(),myrand(),myrand(),myrand(),myrand()])
+
 
     else:
+      self.layertest = []
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+      self.layertest.append([myrand(), myrand(), myrand(), 0, myrand(), myrand(), myrand(), myrand(), myrand(), myrand()])
+
+      self.layer2 = []
+      self.layer2.append([myrand(),myrand(),myrand(),myrand(),myrand(),myrand(),myrand()])
+      self.layer2.append([myrand(),myrand(),myrand(),myrand(),myrand(),myrand(),myrand()])
+      self.layer2.append([myrand(),myrand(),myrand(),myrand(),myrand(),myrand(),myrand()])
+      self.layer2.append([myrand(),myrand(),myrand(),myrand(),myrand(),myrand(),myrand()])
       print 'Warning: brain inheritance not yet implemented'
 
   def decide(self, h, s, v, mass, ah1, as1, av1, ah2, as2, av2):
     inputs = [h,s,v,mass, ah1, as1, av1, ah2, as2, av2]
 
-    return (self.__tanh(dot(inputs,self.layertest[0])),
-            self.__tanh(dot(inputs,self.layertest[0])),
-            self.__tanh(dot(inputs,self.layertest[0])),
-            self.__tanh(dot(inputs,self.layertest[0])))
+    print inputs
+
+    layer1 = [self.__activation(inputs,self.layertest[0]),
+                 self.__activation(inputs,self.layertest[1]),
+                 self.__activation(inputs,self.layertest[2]),
+                 self.__activation(inputs,self.layertest[3]),
+                 self.__activation(inputs,self.layertest[4]),
+                 self.__activation(inputs,self.layertest[5]),
+                 self.__activation(inputs,self.layertest[6])]
+
+    layer2 = [self.__activation(layer1, self.layer2[0]),
+              self.__activation(layer1, self.layer2[1]),
+              self.__activation(layer1, self.layer2[2]),
+              self.__activation(layer1, self.layer2[3])]
+
+
+    decisions = layer2
+    _max = max([abs(i) for i in decisions])
+    decisions = [i/_max for i in decisions]
+    print decisions
+
+
+    return decisions#.index(max(decisions))
+
+  def __activation(self, inputs, weights):
+    dot_out = dot(inputs, weights)
+    out = dot_out
+    return out
 
   # The Sigmoid function, which describes an S shaped curve.
   # We pass the weighted sum of the inputs through this function to
@@ -257,6 +324,13 @@ class Brain:
 
   def __tanh(self,x):
     return (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+
+  def __softmax(self, values ):
+    values_exp = [math.exp(val) for val in values]
+    sum_exps = sum(values_exp)
+    result = [round(i / sum_exps, 3) for i in values_exp]
+    return result
+
 
 def myrand():
   return 2*random() - 1
