@@ -132,7 +132,7 @@ class Bug:
       if mate_weight > 0 and self.mass > 50:
         #self.mates.add(self)
         print 'mate'
-        print self.mates.add(self)
+        self.mates.add(self)
       else:
         self.mates.discard(self)
 
@@ -281,8 +281,6 @@ class Brain:
   def decide(self, h, s, v, mass, ah1, as1, av1, ah2, as2, av2):
     inputs = [h,s,v,mass, ah1, as1, av1, ah2, as2, av2]
 
-    print inputs
-
     layer1 = [self.__activation(inputs,self.layertest[0]),
                  self.__activation(inputs,self.layertest[1]),
                  self.__activation(inputs,self.layertest[2]),
@@ -300,7 +298,6 @@ class Brain:
     decisions = layer2
     _max = max([abs(i) for i in decisions])
     decisions = [i/_max for i in decisions]
-    print decisions
 
 
     return decisions#.index(max(decisions))

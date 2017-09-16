@@ -50,13 +50,18 @@ class World:
 
       Returns Tile instance
     """
-    row = int(x/self.box_width)
-    col = int(y/self.box_height)
 
     try:
+      row = int(x/self.box_width)
+      col = int(y/self.box_height)
       return self.tiles[col][row]
     except IndexError:
       return Tile(None, 0,0,0,0, h=0,s=0,v=0)
+    except ValueError as e:
+      print 'ValueError encountered.'
+      print 'x: ', x
+      print 'box_width: ', self.box_width
+      raise e
     
   
 _TYPE = 0 
